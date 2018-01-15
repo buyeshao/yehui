@@ -1,0 +1,29 @@
+{extend name="admin@public/base" /}
+{block name="main-content"}
+	<div class="page-content">
+		<div class="row">
+			<div class="col-xs-12">
+
+				<div class="row">
+					<!--<div class="space-6"></div>-->
+					<!--<div class="col-sm-7 infobox-container">-->
+						<!---->
+						<!--<div class="row">-->
+							<!--<div class="col-xs-12">-->
+								<!--<div class="space-6"></div>-->
+							<!--</div>-->
+						<!--</div>-->
+						<!--{:hook('gitinfo')}-->
+						<!--{:hook('sysinfo')}-->
+						<!--{:hook('team')}-->
+					<!--</div>-->
+					<!--<div class="vspace-12-sm"></div>-->
+					<div class="col-sm-5">
+						{:hook('maintain')}
+
+					</div>
+				</div><!-- /.row -->
+			</div><!-- /.col -->
+		</div><!-- /.row -->
+	</div>
+{/block}
