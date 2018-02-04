@@ -96,17 +96,17 @@ class Menu extends Base
 			$img_url='';
 			$file = request()->file('file0');
 			if($file){
-				if(config('storage.storage_open')){
-					//七牛
-					$upload = \Qiniu::instance();
-					$info = $upload->upload();
-					$error = $upload->getError();
-					if ($info) {
-						$img_url= config('storage.domain').$info[0]['key'];
-					}else{
-						$this->error($error,url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
-					}
-				}else{
+				// if(config('storage.storage_open')){
+				// 	//七牛
+				// 	$upload = \Qiniu::instance();
+				// 	$info = $upload->upload();
+				// 	$error = $upload->getError();
+				// 	if ($info) {
+				// 		$img_url= config('storage.domain').$info[0]['key'];
+				// 	}else{
+				// 		$this->error($error,url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
+				// 	}
+				// }else{
 					$validate=config('upload_validate');
 					$info = $file->validate($validate)->rule('uniqid')->move(ROOT_PATH . config('upload_path') . DS . date('Y-m-d'));
 					if($info) {
@@ -119,7 +119,7 @@ class Menu extends Base
 					}else{
 						$this->error($file->getError(),url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
 					}
-				}
+				// }
 			}
 			//处理语言
             $parentid=input('parentid',0,'intval');
@@ -130,24 +130,24 @@ class Menu extends Base
             }
 			//构建数组
 			$data=array(
+				
 				'menu_name'=>input('menu_name'),
-				'menu_l'=>$menu_l,
 				'parentid'=>$parentid,
+                'menu_l'=>$menu_l,
 				'menu_open'=>input('menu_open',0),
 				'listorder'=>input('listorder'),
 				'menu_seo_title'=>input('menu_seo_title'),
 				'menu_seo_key'=>input('menu_seo_key'),
 				'menu_seo_des'=>input('menu_seo_des'),
-				'menu_content'=>htmlspecialchars_decode(input('menu_content')),
 				'menu_img'=>$img_url,
 			);
 			$rst=MenuModel::create($data);
-			$menu_model=new MenuModel;
+			$nodelist =  input('nodelist/a');
+			if( !empty ( $rst['id'] ) && $nodelist ){
+				MenuModel::saveNodeList(  $rst['id'],$nodelist);
+			}
 			if($rst!==false){
-				$arr=MenuModel::get(input('parentid'));
-				if(input('menu_type')==3 && $arr['menu_type']==3){
-					$menu_model->where(array('id'=>input('parentid')))->setField('menu_type',1);
-				}
+			
 				cache('site_nav_main',null);
 				$this->success('菜单添加成功',url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
 			}else{
@@ -160,7 +160,8 @@ class Menu extends Base
      */
 	public function news_menu_edit()
 	{
-		$menu=MenuModel::get(input('id'));
+		$id = (int)input('id');
+		$menu=MenuModel::get($id);
 		$options_model=new OptionsModel;
 		$tpls=$options_model->tpls($this->lang);
         $model=Db::name('model')->select();
@@ -170,10 +171,12 @@ class Menu extends Base
         if(!config('lang_switch_on')){
             $where['menu_l']=  $this->lang;
         }
+        $menu_node_list = Db::name('menu_node')->where("menu_id = '{$id}' AND status = 1")->order(' id Desc')->select();
         $menu_text=Db::name('menu')->where($where)->order('menu_l Desc,listorder')->select();
         $menu_text = menu_left($menu_text,'id','parentid');
         $this->assign('menu_text',$menu_text);
 		$this->assign('menu',$menu);
+		$this->assign('menu_node_list',$menu_node_list);
 		$this->assign('tpls',$tpls);
 		return $this->fetch();
 	}
@@ -182,6 +185,7 @@ class Menu extends Base
      */
 	public function news_menu_runedit()
 	{
+		
 		$lang_list=input('lang_list');
         if(empty($lang_list)) $lang_list=input('menu_l',$this->lang);
 		if (!request()->isAjax()){
@@ -193,17 +197,17 @@ class Menu extends Base
 			if ($checkpic!=$oldcheckpic){
 				$file = request()->file('file0');
 				if($file){
-					if(config('storage.storage_open')){
-						//七牛
-						$upload = \Qiniu::instance();
-						$info = $upload->upload();
-						$error = $upload->getError();
-						if ($info) {
-							$img_url= config('storage.domain').$info[0]['key'];
-						}else{
-							$this->error($error,url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));//否则就是上传错误，显示错误原因
-						}
-					}else{
+					// if(config('storage.storage_open')){
+					// 	//七牛
+					// 	$upload = \Qiniu::instance();
+					// 	$info = $upload->upload();
+					// 	$error = $upload->getError();
+					// 	if ($info) {
+					// 		$img_url= config('storage.domain').$info[0]['key'];
+					// 	}else{
+					// 		$this->error($error,url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));//否则就是上传错误，显示错误原因
+					// 	}
+					// }else{
 						$validate=config('upload_validate');
 						$info = $file->validate($validate)->rule('uniqid')->move(ROOT_PATH . config('upload_path') . DS . date('Y-m-d'));
 						if($info) {
@@ -216,7 +220,7 @@ class Menu extends Base
 						}else{
 							$this->error($file->getError(),url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
 						}
-					}
+					// }
 				}
 			}
             //处理语言
@@ -226,28 +230,25 @@ class Menu extends Base
             }else{
                 $menu_l=input('menu_l',$this->lang);
             }
-			$data=array(
+			$data = array(
 				'id'=>input('id'),
 				'menu_name'=>input('menu_name'),
-				'menu_enname'=>input('menu_enname'),
-				'menu_type'=>input('menu_type'),
-                'menu_modelid'=>input('menu_modelid',0,'intval'),
 				'parentid'=>$parentid,
                 'menu_l'=>$menu_l,
-				'menu_listtpl'=>input('menu_listtpl'),
-				'menu_newstpl'=>input('menu_newstpl'),
-				'menu_address'=>input('menu_address'),
 				'menu_open'=>input('menu_open',0),
 				'listorder'=>input('listorder'),
 				'menu_seo_title'=>input('menu_seo_title'),
 				'menu_seo_key'=>input('menu_seo_key'),
 				'menu_seo_des'=>input('menu_seo_des'),
-				'menu_content'=>htmlspecialchars_decode(input('menu_content')),
 			);
 			if ($checkpic!=$oldcheckpic){
 				$data['menu_img']=$img_url;
 			}
 			$rst=MenuModel::update($data);
+			$nodelist =  input('nodelist/a');
+			if(  (int)input('id')){
+				MenuModel::saveNodeList( input('id'),$nodelist);
+			}
 			if($rst!==false){
 				cache('site_nav_main',null);
 				$this->success('菜单修改成功',url('admin/Menu/news_menu_list',array('menu_l'=>$lang_list)));
@@ -264,21 +265,15 @@ class Menu extends Base
 		$lang_list=input('lang_list');
 		$id=input('id');
 		$arr=MenuModel::get($id);
-		$model_id=$arr['menu_modelid'];
 		$parentid=$arr['parentid'];
 		$parent_arr=MenuModel::get($parentid);
 		$ids=get_menu_byid($id,1,2);//返回含自身id及子菜单id数组
 		$rst=MenuModel::destroy($ids);
-		$menu_model=new MenuModel;
+		if($arr['menu_img']){
+			@unlink(ROOT_PATH.$arr['menu_img']);
+		}
 		//处理父级
 		if($rst!==false){
-			//判断其父菜单是否还存在子菜单，如无子菜单，且父菜单类型为1
-			if($parentid && $parent_arr['menu_type']==1){
-				$child=$menu_model->where(array('parentid'=>$parentid))->select();
-				if(empty($child)){
-					$menu_model->where(array('id'=>$parentid))->update(['menu_type'=>3,'menu_modelid'=>$model_id]);
-				}
-			}
 			cache('site_nav_main',null);
 			$this->success('菜单删除成功',url('admin/Menu/news_menu_list',['menu_l'=>$lang_list]));
 		}else{

@@ -27,18 +27,7 @@
 						</div>
 					</div>
 
-					<!--{if condition="config('lang_switch_on')"}-->
-					<!--<div id="menu_l" class="form-group {neq name="menu_l" value=""}none{/neq}">-->
-						<!--<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 选择语言： </label>-->
-						<!--<div class="col-sm-9">-->
-							<!--<select name="menu_l"  class="col-sm-3 selector" required>-->
-								<!--<option value="">请选择语言</option>-->
-								<!--<option value="zh-cn" {if condition="$menu_l eq 'zh-cn'"}selected{/if}>中文</option>-->
-								<!--<option value="en-us" {if condition="$menu_l eq 'en-us'"}selected{/if}>英语</option>-->
-							<!--</select>-->
-						<!--</div>-->
-					<!--</div>-->
-					<!--{/if}-->
+					
 
 					
 
@@ -52,6 +41,19 @@
 						</div>
 					</div>
 
+					<div class="form-group" id="node_list">
+						<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 页面节点： </label>
+						<div class="col-sm-9" style="padding-top:5px;">
+							<div  id="node_list_div">
+						
+							</div>
+							
+								&nbsp;<a href="javascript:;" style="background:#ffcc66" onclick="addnode()" title="添加页面节点" class="file">
+								添加节点
+							</a>
+						</div>
+						
+					</div>
 
 					<div class="form-group">
 						<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 排序（从小到大）： </label>
@@ -78,19 +80,6 @@
 						</div>
 					</div>
 
-
-					<div class="form-group" id="menu_content">
-						<label class="col-sm-3 control-label no-padding-right" for="form-field-1"> 单页面内容： </label>
-						<div class="col-sm-9">
-							<script src="__PUBLIC__/ueditor/ueditor.config.js" type="text/javascript"></script>
-							<script src="__PUBLIC__/ueditor/ueditor.all.js" type="text/javascript"></script>
-							<textarea name="menu_content" rows="100%" style="width:100%" id="myEditor"></textarea>
-							<script type="text/javascript">
-								var editor = new UE.ui.Editor();
-								editor.render("myEditor");
-							</script>
-						</div>
-					</div>
 
 
 					<div class="form-group">
@@ -142,31 +131,34 @@
 {/block}
 {block name="scripts"}
     <script>
-        $('#address,#model,#menu_content,#single,#pic_list').hide();//默认隐藏
-        $('#type2').click(function(){
-            $('#address').show();
-            $('#menu_content,#pic_list,#single,#listtpl,#newstpl,#model').hide();
-        });
-        $('#type1').click(function(){
-            $('#address,#menu_content,#pic_list,#single,#model').hide();
-            $('#listtpl,#newstpl').show();
-        });
-        // $('#type3').click(function(){
-        //     $('#address,#menu_content,#pic_list,#single').hide();
-        //     $('#listtpl,#newstpl,#model').show();
-        // });
-        // $('#type4').click(function(){
-        //     $('#address,#newstpl,#model').hide();
-        //     $('#single，#listtpl,#menu_content,#pic_list').show();
-        // });
-        //语言
-		$('#parentid').change(function(){
-            var $parentid=$(this).children('option:selected').val();
-            if($parentid){
-                $('#menu_l').hide();
-			}else{
-                $('#menu_l').show();
-			}
-        });
+      	function  addnode(){
+            layer.prompt( {title: '输入名称', formType: 3}, function(pass, index){
+
+            	let input_id = randomString();
+
+            	let input = '<input  type="hidden" id="input_'+input_id+'" name="nodelist[\''+input_id+'\']" value="'+pass+'"/>';
+				let a = '<a style="margin-right:10px;" href="javascript:;" id="a_'+input_id+'" onclick="deletenode(\''+input_id+'\');" title="点击删除" class="file">'+pass+'</a>';
+                $("#node_list").append(input);
+                $("#node_list_div").append(a);
+                layer.close(index)
+            });
+
+        }
+
+   
+        function  deletenode(input_id){
+           let index = layer.confirm('确定要删除吗？', {
+				  btn: ['确定','取消'] //按钮
+				}, function(){
+				 	$(document).find("#input_"+input_id).remove();
+				 	$(document).find("#a_"+input_id).remove();
+				 	layer.close(index)
+				}, function(){
+				 
+				});
+
+        }
+      
+       
     </script>
 {/block}
