@@ -18,16 +18,25 @@
 					<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章所属主栏目： </label>
 						<div class="col-sm-10">
-							<select name="news_columnid"  class="col-sm-3 selector" required>
+							<select name="news_columnid"  class=" menu_change col-sm-3 selector" required>
 								<option value="">请选择所属栏目</option>
 								{foreach name="menu" item="vo"}
-									<option value="{$vo.id}" {if condition="$vo.id eq $news_columnid"} selected {/if} {if condition="$vo.menu_type eq 1"}disabled class="bgccc"{else/}class="bgc"{/if}>{$vo.lefthtml}{$vo.menu_name}({if condition="$vo.menu_l eq 'zh-cn'"}中{else /}英{/if}) {if condition="$vo.menu_type eq 1"}(频道页){/if}</option>
+									<option value="{$vo.id}" >{$vo.lefthtml}{$vo.menu_name}</option>
 								{/foreach}
 							</select>
 						</div>
 					</div>
 					<div class="space-4"></div>
-					
+					<div class="form-group">
+						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章所属节点： </label>
+						<div class="col-sm-10">
+							<select name="menu_node_id"  id="menu_node_select" class="col-sm-3 " required>
+								<option value="">请选择所属节点</option>
+							
+							</select>
+						</div>
+					</div>
+					<div class="space-4"></div>
 					<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章名称：  </label>
 						<div class="col-sm-10">
@@ -39,36 +48,10 @@
 						</div>
 					</div>
 					<div class="space-4"></div>
-					
-					
-					<div class="form-group">
-						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章属性：  </label>
-						<div class="checkbox">
-							{foreach name='diyflag' item='diyflag'}
-								<label id="news_flag_{$diyflag.diyflag_value}">
-									<input class="ace ace-checkbox-2" name="news_flag[]" type="checkbox" id="news_flag_va{$diyflag.diyflag_value}" value="{$diyflag.diyflag_value}" />
-									<span class="lbl"> {$diyflag.diyflag_name}</span>
-								</label>
-							{/foreach}
-						</div>
-					</div>
+				
 					<div class="space-4"></div>
 
-					<div class="form-group" id="pptaddress">
-						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 跳转地址：  </label>
-						<div class="col-sm-10">
-							<input type="text" name="news_zaddress" id="news_zaddress" placeholder="跳转地址" class="col-xs-10 col-sm-6" />
-                                            <span class="help-inline col-xs-12 col-sm-6">
-												<span class="middle">正确格式：http:// 开头</span>
-											</span>
-						</div>
-					</div>
-					<div class="form-group" id="cpprice">
-						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 产品价格：  </label>
-						<div class="col-sm-10">
-							<input type="number" name="news_cpprice" id="news_cpprice" placeholder="产品价格" class="col-xs-10 col-sm-6" />
-						</div>
-					</div>
+					
 					<div class="space-4"></div>
 
 					<div class="form-group">
@@ -112,7 +95,7 @@
 					<div class="space-4"></div>
 
 
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章图集： </label>
 						<div class="col-sm-10">
 							<div class="radio" >
@@ -128,7 +111,7 @@
 						</div>
 					</div>
 					<div class="space-4"></div>
-					<!-- 多图上传 -->
+
 					<link href="__PUBLIC__/ppy/css/fileinput.css" media="all" rel="stylesheet" type="text/css" />
                     <script src="__PUBLIC__/ppy/js/fileinput.js" type="text/javascript"></script>
                     <script src="__PUBLIC__/ppy/js/fileinput_locale_zh.js" type="text/javascript"></script>
@@ -138,7 +121,7 @@
 							<textarea name="news_pic_content" class="col-xs-12 col-sm-12" id="news_pic_content"  placeholder="单次编辑或添加文章,选择多图时请一次性选择。多图对应文章说明，例如： 图片一说明 | 图片二说明 | 图片三说明    每个文字说明以 | 分割" ></textarea>
 						</div>
 					</div>
-					<div class="space-4"></div>
+					<div class="space-4"></div> -->
 					<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 是否审核： </label>
 						<div class="col-sm-10" style="padding-top:5px;">
@@ -191,12 +174,11 @@ echo date("Y-m-d",$time){/php}" type="text" data-date-format="yyyy-mm-dd">
 					<div class="clearfix form-actions">
 						<div class="col-md-offset-3 col-md-9">
 							<input class="ace ace-checkbox-2" name="continue" type="checkbox" value="1">
-							<span class="lbl"> 发布后继续</span>
+							<span class="lbl"> 保存后继续</span>
 							<button class="btn btn-info" type="submit">
 								<i class="ace-icon fa fa-check bigger-110"></i>
 								保存
 							</button>
-
 							&nbsp; &nbsp; &nbsp;
 							<button class="btn" type="reset">
 								<i class="ace-icon fa fa-undo bigger-110"></i>

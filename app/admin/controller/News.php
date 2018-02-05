@@ -52,16 +52,18 @@ class News extends Base
         if(!config('lang_switch_on')){
             $map['news_l']=  $this->lang;
         }
-		if ($news_columnid!=''){
-			$ids=get_menu_byid($news_columnid,1,2);
-			$map['news_columnid']= array('in',implode(",", $ids));
-		}
+		if( !empty($news_columnid)){
+            $map['news_columnid']=  array('eq',$news_columnid);
+        }
+       
 		$where=$diyflag?"FIND_IN_SET('$diyflag',news_flag)":'';
 		$news_model=new NewsModel;
-		$news=$news_model->alias("a")->field('a.*,b.*,c.menu_name')
+		$news=$news_model->alias("a")->field('a.*,b.*,c.menu_name,mn.name as menu_node_name')
 				->join(config('database.prefix').'member_list b','a.news_auto =b.member_list_id')
 				->join(config('database.prefix').'menu c','a.news_columnid =c.id')
-				->where($map)->where($where)->order('news_time desc')->paginate(config('paginate.list_rows'),false,['query'=>get_query()]);
+				->join(config('database.prefix').'menu_node mn','a.menu_node_id = mn.id','left')
+				->where($map)->where($where)->order('news_time desc')
+				->paginate(config('paginate.list_rows'),false,['query'=>get_query()]);
 		$show = $news->render();
 		$show=preg_replace("(<a[^>]*page[=|/](\d+).+?>(.+?)<\/a>)","<a href='javascript:ajax_page($1);'>$2</a>",$show);
 		$this->assign('page',$show);
@@ -115,35 +117,35 @@ class News extends Base
 		$file = request()->file('pic_one');
 		$files = request()->file('pic_all');
 		if($file || $files) {
-			if(config('storage.storage_open')){
-				//七牛
-				$upload = \Qiniu::instance();
-				$info = $upload->upload();
-				$error = $upload->getError();
-				if ($info) {
-					if($file && $files){
-						//有单图、多图
-						if(!empty($info['pic_one'])) $img_one= config('storage.domain').$info['pic_one'][0]['key'];
-						if(!empty($info['pic_all'])) {
-							foreach ($info['pic_all'] as $file) {
-								$img_url=config('storage.domain').$file['key'];
-								$picall_url = $img_url . ',' . $picall_url;
-							}
-						}
-					}elseif($file){
-						//单图
-						$img_one= config('storage.domain').$info[0]['key'];
-					}else{
-						//多图
-						foreach ($info as $file) {
-							$img_url=config('storage.domain').$file['key'];
-							$picall_url = $img_url . ',' . $picall_url;
-						}
-					}
-				}else{
-					$this->error($error,url('admin/News/news_list'));//否则就是上传错误，显示错误原因
-				}
-			}else{
+			// if(config('storage.storage_open')){
+			// 	//七牛
+			// 	$upload = \Qiniu::instance();
+			// 	$info = $upload->upload();
+			// 	$error = $upload->getError();
+			// 	if ($info) {
+			// 		if($file && $files){
+			// 			//有单图、多图
+			// 			if(!empty($info['pic_one'])) $img_one= config('storage.domain').$info['pic_one'][0]['key'];
+			// 			if(!empty($info['pic_all'])) {
+			// 				foreach ($info['pic_all'] as $file) {
+			// 					$img_url=config('storage.domain').$file['key'];
+			// 					$picall_url = $img_url . ',' . $picall_url;
+			// 				}
+			// 			}
+			// 		}elseif($file){
+			// 			//单图
+			// 			$img_one= config('storage.domain').$info[0]['key'];
+			// 		}else{
+			// 			//多图
+			// 			foreach ($info as $file) {
+			// 				$img_url=config('storage.domain').$file['key'];
+			// 				$picall_url = $img_url . ',' . $picall_url;
+			// 			}
+			// 		}
+			// 	}else{
+			// 		$this->error($error,url('admin/News/news_list'));//否则就是上传错误，显示错误原因
+			// 	}
+			// }else{
 				$validate = config('upload_validate');
 				//单图
 				if ($file) {
@@ -159,7 +161,7 @@ class News extends Base
 					} else {
 						$this->error($file->getError(), url('admin/News/news_list'));//否则就是上传错误，显示错误原因
 					}
-				}
+				// }
 				//多图
 				if ($files) {
 					foreach ($files as $file) {
@@ -180,24 +182,24 @@ class News extends Base
 			}
 		}
 		//获取文章属性
-		$news_flag=input('post.news_flag/a');
-		$flag=array();
-		if(!empty($news_flag)){
-			foreach ($news_flag as $v){
-				$flag[]=$v;
-			}
-		}
-		$flagdata=implode(',',$flag);
+		// $news_flag=input('post.news_flag/a');
+		// $flag=array();
+		// if(!empty($news_flag)){
+		// 	foreach ($news_flag as $v){
+		// 		$flag[]=$v;
+		// 	}
+		// }
+		// $flagdata=implode(',',$flag);
 		$sl_data=array(
 			'news_title'=>input('news_title'),
 			'news_titleshort'=>input('news_titleshort',''),
 			'news_columnid'=>input('news_columnid'),
-			'news_flag'=>$flagdata,
+			'news_flag'=>'',
 			'news_zaddress'=>input('news_zaddress',''),
 			'news_key'=>input('news_key',''),
 			'news_tag'=>input('news_tag',''),
 			'news_source'=>input('news_source',''),
-			'news_pic_type'=>input('news_pic_type'),
+			'news_pic_type'=>1,
 			'news_pic_content'=>input('news_pic_content',''),
 			'news_pic_allurl'=>$picall_url,//多图路径
 			'news_img'=>$img_one,//封面图片路径
@@ -207,6 +209,7 @@ class News extends Base
 			'news_auto'=>session('admin_auth.member_id'),
 			'news_time'=>time(),
 			'listorder'=>input('listorder',50,'intval'),
+			'menu_node_id'=>input('menu_node_id'),
 		);
 		//根据栏目id,获取语言
 		$news_l=Db::name('menu')->where('id',input('news_columnid'))->value('menu_l');
@@ -243,8 +246,10 @@ class News extends Base
 		$menu_text=menu_text($this->lang);
 		$this->assign('menu',$menu_text);
 		$diyflag=Db::name('diyflag')->select();
-		$source=Db::name('source')->select();//来源
+		$source=Db::name('source')->select();
+		$menu_node = Db::name('menu_node')->where(" menu_id = ".$news_list['news_columnid'] )->select();
 		$this->assign('source',$source);
+		$this->assign('menu_node',$menu_node);
 		$this->assign('news_extra',$news_extra);
 		$this->assign('diyflag',$diyflag);
 		$this->assign('news_list',$news_list);
@@ -355,6 +360,7 @@ class News extends Base
 			'news_scontent'=>input('news_scontent',''),
 			'news_content'=>htmlspecialchars_decode(input('news_content')),
 			'listorder'=>input('listorder',50,'intval'),
+			'menu_node_id'=>input('menu_node_id'),
 		);
 		//图片字段处理
 		if(!empty($img_one)){
@@ -501,9 +507,10 @@ class News extends Base
         }
 		$where=$diyflag?"FIND_IN_SET('$diyflag',news_flag)":'';
 		$news_model=new NewsModel;
-		$news=$news_model->alias("a")->field('a.*,b.*,c.menu_name')
+		$news=$news_model->alias("a")->field('a.*,b.*,c.menu_name,mn.name as menu_node_name')
 				->join(config('database.prefix').'member_list b','a.news_auto =b.member_list_id')
 				->join(config('database.prefix').'menu c','a.news_columnid =c.id')->where($map)
+				->join(config('database.prefix').'menu_node mn','a.menu_node_id = mn.id','left')
 				->where($where)->order('news_time desc')->paginate(config('paginate.list_rows'),false,['query'=>get_query()]);
 		$show = $news->render();
 		$show=preg_replace("(<a[^>]*page[=|/](\d+).+?>(.+?)<\/a>)","<a href='javascript:ajax_page($1);'>$2</a>",$show);
@@ -580,4 +587,6 @@ class News extends Base
 			$this -> error("文章彻底删除失败！",url('admin/News/news_back',array('p' => $p)));
 		}
 	}
+
+
 }

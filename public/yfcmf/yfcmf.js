@@ -903,6 +903,24 @@ $(function () {
 			}
 		});	
     });
+    $('body').on('change','.menu_change',function () {
+        var $form = $(this).parents("form");
+        var val = $(this).val();
+        $.ajax({
+            url:'/admin/ajax/news_menu_change',
+            type:"POST",
+            data:{menu_id:val},            
+            success: function(data,status){
+                var html = '<option value="">请选择所属节点</option>';
+                if(data.length>0){
+                    $.each(data,function(inx,ele){
+                       html +='<option value="'+ele.id+'" class="bgc">'+ele.name+'</option>';
+                    })
+                }
+                $("#menu_node_select").html(html);
+            }
+        }); 
+    });
     $('body').on('click','.range_inputs .applyBtn',function () {
         var reservation=$('#reservation');
         var $form = reservation.parents("form");

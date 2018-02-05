@@ -31,4 +31,10 @@ class Ajax
 		$list=\ReadClass::readDir(APP_PATH . $module. DS .'controller');
 		return json($list);
 	}
+	public function news_menu_change(){
+		$map['menu_id'] = input('menu_id');
+		$map['status'] = 1;
+		$list=Db::name("menu_node")->where($map)->select();
+		return json($list);
+	}
 }

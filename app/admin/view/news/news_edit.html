@@ -17,32 +17,44 @@
 					<input type="hidden" name="n_id" id="n_id" value="{$news_list.n_id}" />
 
 					<div class="form-group">
-						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章所属主栏目： </label>
+						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章所属栏目： </label>
 						<div class="col-sm-10">
-							<select name="news_columnid"  class="col-sm-3 " required>
+							<select name="news_columnid"  class="menu_change col-sm-3 " required>
 								<option value="">请选择所属栏目</option>
 								{foreach name="menu" item="vo"}
-									<option value="{$vo.id}"  {if condition="$vo.id eq $news_list['news_columnid']"} selected {/if} {if condition="$vo.menu_type eq 1"}disabled class="bgccc"{else/}class="bgc"{/if}>{$vo.lefthtml}{$vo.menu_name}({if condition="$vo.menu_l eq 'zh-cn'"}中{else /}英{/if}) {if condition="$vo.menu_type eq 1"}(频道页){/if}</option>
+									<option value="{$vo.id}"  {if condition="$vo.id eq $news_list['news_columnid']"} selected {/if} class="bgc">{$vo.lefthtml}{$vo.menu_name} </option>
 								{/foreach}
 							</select>
 						</div>
 					</div>
 					<div class="space-4"></div>
 					
+					<div class="form-group">
+						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章所属节点： </label>
+						<div class="col-sm-10">
+							<select name="menu_node_id"  id="menu_node_select" class="col-sm-3 " required>
+								<option value="">请选择所属节点</option>
+								{foreach name="menu_node" item="vo"}
+									<option value="{$vo.id}"  {if condition="$vo.id eq $news_list['menu_node_id']"} selected {/if} class="bgc">{$vo.name} </option>
+								{/foreach}
+							</select>
+						</div>
+					</div>
+					<div class="space-4"></div>
 
 					<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章名称：  </label>
 						<div class="col-sm-10">
 							<input type="text" name="news_title" id="news_title"  value="{$news_list.news_title}"   class="col-xs-10 col-sm-6" required/>
 							<input type="text" name="news_titleshort" id="news_titleshort"  value="{$news_list.news_titleshort}" placeholder="简短标题，建议6~12字数" class="col-xs-10 col-sm-4" style="margin-left:10px;" />
-                                            <span class="help-inline col-xs-12 col-sm-7">
-												<span class="middle" id="resone"></span>
-											</span>
+                            <span class="help-inline col-xs-12 col-sm-7">
+								<span class="middle" id="resone"></span>
+							</span>
 						</div>
 					</div>
 					<div class="space-4"></div>
 
-					<div class="form-group">
+				<!-- 	<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章属性：  </label>
 						<div class="checkbox">
 							{foreach name='diyflag' item='diyflag'}
@@ -52,8 +64,8 @@
 								</label>
 							{/foreach}
 						</div>
-					</div>
-					<div class="space-4"></div>
+					</div> -->
+					<!-- <div class="space-4"></div>
 					<div class="form-group" id="pptaddress">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 跳转地址：  </label>
 						<div class="col-sm-10">
@@ -69,7 +81,7 @@
 							<input type="number" name="news_cpprice" id="news_cpprice"  value="{$news_list.news_cpprice}"   placeholder="输入产品价格" class="col-xs-10 col-sm-6" />
 						</div>
 					</div>
-					<div class="space-4"></div>
+					<div class="space-4"></div> -->
 
 					<div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章关键字：  </label>
@@ -112,7 +124,7 @@
 					<div class="space-4"></div>
 
 
-					<div class="form-group">
+					<!-- <div class="form-group">
 						<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> 文章图集： </label>
 						<div class="col-sm-10">
 							<div class="radio" >
@@ -141,7 +153,7 @@
 							<input id="file-5" name="pic_all[]" type="file" class="file"  multiple data-preview-file-type="any" data-upload-url="#" data-preview-file-icon=""><br />
 							<textarea name="news_pic_content" class="col-xs-12 col-sm-12" id="news_pic_content"  placeholder="单次编辑或添加文章,选择多图时请一次性选择。多图对应文章说明，例如： 图片一说明 | 图片二说明 | 图片三说明    每个文字说明以 | 分割" >{$news_list['news_pic_content']}</textarea>
 						</div>
-					</div>
+					</div> -->
 					<div class="space-4"></div>
 					<!--老多图字符串-->
 					<input name="pic_oldlist" type="hidden" id="pic_oldlist" type="text" size="130" value="{$news_list.news_pic_allurl}" >
